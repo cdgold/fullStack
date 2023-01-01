@@ -1,0 +1,9 @@
+GET https://second-test.fly.dev:8080/api/persons
+###
+POST http://localhost:8080/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Borisss",
+    "number": "222 0033330 123"
+}
