@@ -1,6 +1,6 @@
-# fly.toml file generated for second-test on 2023-01-01T15:06:46-05:00
+# fly.toml file generated for test-fullstack-phonebook on 2023-01-08T22:23:38-05:00
 
-app = "second-test"
+app = "test-fullstack-phonebook"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
@@ -13,7 +13,7 @@ processes = []
 
 [[services]]
   http_checks = []
-  internal_port = 3001
+  internal_port = 8080
   processes = ["app"]
   protocol = "tcp"
   script_checks = []

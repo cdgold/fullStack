@@ -63,7 +63,7 @@ const Notification = ( { message } ) => {
 }
 
 const ErrorNotification = ( { message } ) => {
-  console.log("Message is: ", message)
+  //console.log("Message is: ", message)
   const messageStyle = {
     color: "red",
     background: "lightgrey",
@@ -110,7 +110,7 @@ const App = () => {
         let newPerson = {...foundPerson, number:newNumber}
         numberService.update(newPerson, newPerson.id)
           .then(response => {
-            let newPersons = persons.map(person => newPerson.id == person.id ? response : person)
+            let newPersons = persons.map(person => newPerson.id === person.id ? response : person)
             setPersons(newPersons)
             setMessage(
               `Number changed to '${newPerson.number}' for ${newPerson.name}`
@@ -120,9 +120,8 @@ const App = () => {
             }, 5000)
           })
           .catch(error => {
-            setErrorMessage(
-              `${newPerson.name} already deleted.`
-              )
+            console.log("Error in updating name/number was: ", error.response.data.error)
+            setErrorMessage(error.response.data.error)
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
@@ -149,7 +148,15 @@ const App = () => {
           setMessage(null)
         }, 5000)
       })
-      .catch(error => {console.log("Network error when creating new person, it was: ", error)})
+      .catch(err => {
+        console.log("error !!!!")
+        console.log(err)
+        console.log("error should be above!")
+        setErrorMessage(err.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
     }
   }
   
@@ -163,7 +170,7 @@ const App = () => {
   
   const deleteHandler = (personID) => {
     numberService.deleteRequest(personID)
-      .then(setPersons(persons.filter(person => person.id != personID)))
+      .then(setPersons(persons.filter(person => person.id !== personID)))
       .catch(error => {
         setErrorMessage(
           `Person already deleted.`
@@ -198,9 +205,7 @@ const App = () => {
     numberService
       .getAll()
       .then(response => {
-        console.log('response is: ', response)
         setPersons(response)
-        console.log('whats reponse.persons its ', response)
       })
   }, [])
 
