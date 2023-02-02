@@ -5,5 +5,13 @@ content-type: application/json
 
 {
     "name": "Newby Newman",
-    "number": "1233324"
+    "number": "123"
+}
+###
+POST http://localhost:8080/api/persons/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Rumjadsfi",
+    "number": "-231234322"
 }
