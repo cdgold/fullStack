@@ -1,10 +1,35 @@
-POST http://localhost:3003/api/blogs/ HTTP/1.1
+GET http://localhost:3003/api/blogs/
+###
+POST http://localhost:3003/api/login/ HTTP/1.1
 content-type: application/json
 
 {
-    "title": "sample",
-    "author": "Johnny Test",
-    "url": "google.com/aersers",
-    "likes": "2"
+    "username": "narpus",
+    "password": "awerawer"
+}
+###
+POST http://localhost:3003/api/blogs/ HTTP/1.1
+content-type: application/json
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCpXVCJ9.eyJ1c2VybmFtZSI6Im5hcnB1cyIsImlkIjoiNjNkZWJjYTg2ZmVjMTRkMGMyZGYzYzdiIiwiaWF0IjoxNjc1NjI1OTcxfQ.4TinPbOGadZCteEcO6LGRi1xmMbIRq1h6N270I12APs
+
+{
+    "title": "newBlog",
+    "author": "Regnia",
+    "url": "google.com/1232",
+    "likes": "0",
+    "userId": "63debca86fec14d0c2df3c7b"
+}
+###
+DELETE http://localhost:3003/api/blogs/63e007c2865543610832a1e2/ HTTP/1.1
+content-type: application/json
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCpXVCJ9.eyJ1c2VybmFtZSI6Im5hcnB1cyIsImlkIjoiNjNkZWJjYTg2ZmVjMTRkMGMyZGYzYzdiIiwiaWF0IjoxNjc1NjI1OTcxfQ.4TinPbOGadZCteEcO6LGRi1xmMbIRq1h6N270I12APs
+###
+POST http://localhost:3003/api/users/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "narpus",
+    "name": "Roger",
+    "password": "awerawer"
 }
 
