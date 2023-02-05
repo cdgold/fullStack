@@ -18,27 +18,21 @@ blogsRouter.post("/", async (request, response, next) => {
   const user = request.user
   try {
     console.log("in blogsRouter.post, user is: ", user)
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if(!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" })
-  }
-  
-    const blog = new Blog( { ...body, user: user._id })
-    
-    console.log("blogaboga is: ", blog)
-    console.log("SO IT'S TRUE? ", "likes" in blog)
-    console.log("I SHOULD BE GETTING FUCKED, THEN? ", !("likes" in blog))
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if(!decodedToken.id) {
+      return response.status(401).json({ error: "token invalid" })
+    }
 
-    if (1 === 1) {
-      console.log("no likes!")
+    let blog = new Blog( { ...body, user: user._id })
 
+    if (blog.likes === undefined) {
       blog.likes = 0
     }
 
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
-    
+
     response.json(savedBlog)
   }
   catch (error) {

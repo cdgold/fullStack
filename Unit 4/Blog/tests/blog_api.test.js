@@ -214,6 +214,30 @@ describe("when a user is logged in, two starting blogs", () => {
     expect(foundBlog.likes).toBe(0)
   })
 
+  test("unauthorized when posting without token", async () => {
+    const users = await helper.usersInDb()
+    const rootUser = users[0]
+
+    const newBlog = {
+      title: "How to Lose a Guy in 10 Days",
+      author: "Paul Rudd",
+      url: "www.netflix.com/view/?wq2j",
+      userId: rootUser.id
+    }
+
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set("Authorization", `bearer badToken`)
+      .expect(401)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const titles = blogsAtEnd.map(blog => blog.title)
+    expect(titles).not.toContain(newBlog.title)
+  })
+
 })
 
 
