@@ -1,4 +1,4 @@
-GET http://localhost:3003/api/users/
+GET http://localhost:3003/api/blogs/
 ###
 POST http://localhost:3003/api/login/ HTTP/1.1
 content-type: application/json
@@ -32,4 +32,15 @@ content-type: application/json
     "name": "Beebis",
     "password": "awer"
 }
+###
+POST http://localhost:3003/api/blogs/ HTTP/1.1
+content-type: application/json
+authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5hcnB1cyIsImlkIjoiNjNlMDExMzhlZDUwOGZlOGZiNDA2NWYzIiwiaWF0IjoxNjc1NjI4ODcxfQ.MuqxPBfa8D1hAmqKzpGRJjswvg5eNTQx_HeVdEcKHI4
 
+{
+    "title": "sample",
+    "author": "Johnny Test",
+    "url": "google.com/aersers",
+    "likes": 2,
+    "userId": "63debca86fec14d0c2df3c7b"
+}
