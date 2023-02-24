@@ -35,12 +35,4 @@ export const useNotificationDispatch = () => {
   return notificationAndDispatch[1]
 }
 
-export const setNotification = (message) => {
-  return async dispatch => {
-    dispatch({ type:"SET_MESSAGE", payload:message })
-  }
-}
-
-
-
 export default NotificationContext
