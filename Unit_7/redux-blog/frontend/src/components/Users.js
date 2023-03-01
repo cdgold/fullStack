@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react"
-import userService from "../services/users"
+import { useSelector } from "react-redux"
+import { Link } from "react-router-dom"
+
+// LINK MIGHT NOT BE RIGHT? USE PARAMS.ID AND USEMATCH?
 
 const UserRow = ({user}) => {
     if (user !== undefined) {
@@ -7,7 +9,7 @@ const UserRow = ({user}) => {
         return(
             <tr key={user.id}>
                 <td>
-                    {user.username}
+                    <Link to={`/user/${user.id}`}>{user.username} </Link>
                 </td>
                 <td>
                     {user.blogs.length}
@@ -19,17 +21,9 @@ const UserRow = ({user}) => {
 }
 
 const Users = () => {
-    const [users, setUsers] = useState(null)
+    const users = useSelector(state => state.user.allUsers)
 
-    useEffect(() => {
-        const getFct = async () => {
-          const userList = await userService.getUsers()
-          setUsers(userList)
-        }
-        getFct()
-    }, [])
-
-    if (users === null) {
+    if (users === null || users === []) {
         return(
             <div>
               "No users to show..."

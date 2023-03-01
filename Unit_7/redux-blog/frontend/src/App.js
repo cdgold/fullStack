@@ -6,9 +6,10 @@ import ErrorNotification from "./components/ErrorNotification"
 import Users from "./components/Users"
 import blogService from './services/blogs'
 import loginService from "./services/login"
+import userService from "./services/users"
 import { useDispatch, useSelector } from "react-redux"
 import { initializeBlogs, setBlogs } from "./reducers/blogReducer"
-import { setUser } from "./reducers/userReducer"
+import { setUser, setAllUsers } from "./reducers/userReducer"
 import { setMessage } from "./reducers/notificationReducer"
 import { setErrorMessage } from "./reducers/notificationReducer"
 import {
@@ -86,7 +87,7 @@ const App = () => {
       const sortedBlogs = arrayToSort.sort((a, b) => {return b.likes - a.likes})
       returnBlogs = sortedBlogs
     }
-    return [returnBlogs, state.user]
+    return [returnBlogs, state.user.user]
   })
 
   // const [blogs, setBlogs] = useState([])
@@ -201,6 +202,12 @@ const App = () => {
       dispatch(setUser(user))
       blogService.setToken(user.token)
     }
+    async function getUsersAsync() {
+      const userList = await userService.getUsers()
+      console.log("userList is: ", userList)
+      dispatch(setAllUsers(userList))
+    }
+    getUsersAsync()
   }, [dispatch])
 
   useEffect(() => {
