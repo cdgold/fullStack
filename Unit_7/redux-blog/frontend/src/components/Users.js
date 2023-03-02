@@ -1,15 +1,13 @@
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 
-// LINK MIGHT NOT BE RIGHT? USE PARAMS.ID AND USEMATCH?
-
 const UserRow = ({user}) => {
     if (user !== undefined) {
         console.log("user is: ", user)
         return(
             <tr key={user.id}>
                 <td>
-                    <Link to={`/user/${user.id}`}>{user.username} </Link>
+                    <Link to={`/users/${user.id}`}>{user.username} </Link>
                 </td>
                 <td>
                     {user.blogs.length}

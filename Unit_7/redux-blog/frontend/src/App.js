@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from "./components/Notification"
 import ErrorNotification from "./components/ErrorNotification"
+import User from "./components/User"
 import Users from "./components/Users"
 import blogService from './services/blogs'
 import loginService from "./services/login"
@@ -14,18 +15,8 @@ import { setMessage } from "./reducers/notificationReducer"
 import { setErrorMessage } from "./reducers/notificationReducer"
 import {
   BrowserRouter as Router,
-  Routes, Route, Link
+  Routes, Route, Link, useMatch
 } from 'react-router-dom'
-
-/*
-TO DO: 
-implement useDispatch here
-** change where blogs get state here
-change where user get state here
-change where notifications get state here
-implement reducers (blog, login, notification)
-*/
-
 
 const Togglable = (props) => {
   const [visible, setVisible] = useState(false)
@@ -50,14 +41,22 @@ const Togglable = (props) => {
   )
 }
 
-const Home = ({blogs, user, createBlog, incrementLikes, deleteBlog}) => {
+const Home = ({blogs, createBlog}) => {
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+  
   return(  
     <div>  
     <Togglable buttonLabel="new blog">
       <BlogForm createBlog = {createBlog}/>
     </Togglable>
     {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} user={user} incrementLikes={incrementLikes} deleteBlog={deleteBlog} />
+      <Link to={`/blogs/${blog.id}`} style={blogStyle}> {blog.title} by {blog.author} </Link>
     )}
     </div>
   )
@@ -79,7 +78,8 @@ const Header = () => {
 
 const App = () => {
   const dispatch = useDispatch()
-  const [blogs, user] = useSelector(state => {
+
+  const [blogs, users] = useSelector(state => {
     let returnBlogs = []
     if (state.blogs !== undefined){
       console.log("state is now: ", state)
@@ -87,15 +87,20 @@ const App = () => {
       const sortedBlogs = arrayToSort.sort((a, b) => {return b.likes - a.likes})
       returnBlogs = sortedBlogs
     }
-    return [returnBlogs, state.user.user]
+    return [returnBlogs, state.user]
   })
 
-  // const [blogs, setBlogs] = useState([])
+  const userMatch = useMatch("/users/:id")
+  const viewedUser = userMatch
+    ? users.allUsers.find(a => a.id === userMatch.params.id)
+    : null
+  const blogMatch = useMatch("/blogs/:id")
+  const viewedBlog = blogMatch
+    ? blogs.find(a => a.id === blogMatch.params.id)
+    : null
+
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  // const [user, setUser] = useState(null) 
-  // const [message, setMessage] = useState("")
-  //const [errorMessage, setErrorMessage] = useState("")
 
 
   const handleLogin = async (event) => {
@@ -125,12 +130,12 @@ const App = () => {
   }
     
   const createBlog = ( newBlog ) => {
-    console.log("(in app.js) New blog being created by ", user)
+    console.log("(in app.js) New blog being created by ", users.user)
     console.log("(in app.js) Attempting create with blog: ", newBlog)
     blogService.postBlog(newBlog)
       .then(result => {
         console.log("Result is: ", result)
-        const showBlog = { ...result.data, user:user }
+        const showBlog = { ...result.data, user:users.user }
         const newBlogs = blogs.concat(showBlog)
         dispatch(setMessage(`Added blog: ${showBlog.title} by ${showBlog.author}`))
         setTimeout(() => {
@@ -211,13 +216,13 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (user !== null) {
+    if (users.user !== null) {
       dispatch(initializeBlogs())
     }
-  }, [dispatch, user])
+  }, [dispatch, users.user])
 
 
-  if (user === null) {
+  if (users.user === null) {
     return (
       <div>
         <Notification />
@@ -252,15 +257,22 @@ const App = () => {
       <Header />
       <div>
         <h2>blogs</h2>
-        <> {user.name} logged in </> <button onClick={() => logout()}>logout</button>
+        <> {users.user.name} logged in </> <button onClick={() => logout()}>logout</button>
       </div>
       <Routes>
+        <Route path="/users/:id" element={<User user={viewedUser} />} />
         <Route path="/users" element={<Users />} />
         <Route 
           path="/" 
-          element={<Home blogs={blogs} user={user} createBlog={createBlog} incrementLikes={incrementLikes} 
+          element={<Home blogs={blogs} user={users.user} createBlog={createBlog} incrementLikes={incrementLikes} 
             deleteBlog={deleteBlog} />
           }
+        />
+        <Route path="/blogs/:id" element={
+          <Blog blog={viewedBlog} 
+          user={users.user} 
+          incrementLikes={incrementLikes} 
+          deleteBlog={deleteBlog}/>} 
         />
       </Routes>
   </div>
