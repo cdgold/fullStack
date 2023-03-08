@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button } from "@mui/material"
 
 const BlogForm = ({ createBlog }) => {
     const [title, setTitle] = useState("")
@@ -41,7 +42,7 @@ const BlogForm = ({ createBlog }) => {
             id="newBlogUrl"
             onChange={event => setUrl(event.target.value)}></input></>
           <br></br>
-            <button type="submit" value="Submit" id="createBlogButton"> create </button>
+            <Button type="submit" value="Submit" id="createBlogButton" variant="contained" color="primary" > create </Button>
         <br></br>
         </form>
       </div>

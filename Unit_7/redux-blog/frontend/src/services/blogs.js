@@ -20,6 +20,13 @@ const postBlog = (newBlog) => {
   return request
 }
 
+const postComment = ({comment, id}) => {
+  const commentUrl = baseUrl + "/" + id + "/comments"
+  console.log("Comment url is: ", commentUrl)
+  const request = axios.post(commentUrl, { comment:comment })
+  return request
+}
+
 
 const putBlog = (newBlog) => {
   const blogRequest = {
@@ -50,5 +57,6 @@ export default {
   postBlog,
   putBlog,
   deleteBlog,
-  setToken
+  setToken,
+  postComment
  }

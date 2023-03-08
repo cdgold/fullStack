@@ -17,7 +17,6 @@ blogsRouter.post("/", async (request, response, next) => {
   const body = request.body
   const user = request.user
   try {
-    console.log("in blogsRouter.post, user is: ", user)
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     if(!decodedToken.id) {
       return response.status(401).json({ error: "token invalid" })
@@ -29,11 +28,35 @@ blogsRouter.post("/", async (request, response, next) => {
       blog.likes = 0
     }
 
+    if (blog.comments === undefined || blog.comments === null) {
+      blog.comments = []
+    }
+
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
 
     response.json(savedBlog)
+  }
+  catch (error) {
+    next(error)
+  }
+})
+
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+  const body = request.body
+  if (!body.comment) {
+    return response.status(400).end()
+  }
+  const comment = body.comment
+  try {
+    const oldBlog = await Blog.findById(request.params.id)
+    const newComments = oldBlog.comments.concat(comment)
+    console.log("New comments is: ", newComments)
+    const update = { comments:newComments }
+    console.log("Update is: ", update)
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, update, { new: true })
+    response.json(updatedBlog)
   }
   catch (error) {
     next(error)
@@ -63,6 +86,7 @@ blogsRouter.put("/:id", async (request, response, next) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    comments: body.comments,
     user: body.user
   }
   try {

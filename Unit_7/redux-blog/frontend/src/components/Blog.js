@@ -1,8 +1,17 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
+import useState from "react"
 
-const Blog = ({blog, user, incrementLikes, deleteBlog}) => {
+const Blog = ({blog, user, incrementLikes, deleteBlog, addComment}) => {
   const showIfMatchingUser = { display: user.username === blog.user.username ? '' : 'none'}
+
+  const handleComment = (event) => {
+    event.preventDefault()
+    const comment = event.target.comment.value
+    console.log("comment is: ",  comment)
+    const functionArg = {blog:blog, comment:comment}
+    addComment(functionArg)
+    event.target.comment.value = ""
+  }
 
   return (
   <div className="blog">
@@ -17,6 +26,22 @@ const Blog = ({blog, user, incrementLikes, deleteBlog}) => {
       added by {blog.user.name} 
       <br></br>
       <button style={showIfMatchingUser} className="removeButton" onClick={() => deleteBlog(blog)}>remove</button>
+      <h3>comments</h3>
+        <form onSubmit={handleComment}>
+          <div>
+            <input 
+              type="text"
+              name="comment"
+            />
+          </div>
+          <button type="submit"> add comment </button>
+
+        </form> 
+      <ul>
+      {blog.comments.map(comment => {
+        return(<li> {comment} </li>)
+      })}
+      </ul>
      </div>  
   </div>
   )

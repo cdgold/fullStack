@@ -1,5 +1,13 @@
 GET http://localhost:3003/api/blogs/
 ###
+POST http://localhost:3003/api/blogs/6400ee79572fb6af41e6dce5/comments
+content-type: application/json
+
+{
+    "comment": "Love this!"
+}
+
+###
 POST http://localhost:3003/api/login/ HTTP/1.1
 content-type: application/json
 

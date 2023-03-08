@@ -1,18 +1,26 @@
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 
 const UserRow = ({user}) => {
     if (user !== undefined) {
         console.log("user is: ", user)
         return(
-            <tr key={user.id}>
-                <td>
+            <TableRow key={user.id}>
+                <TableCell>
                     <Link to={`/users/${user.id}`}>{user.username} </Link>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                     {user.blogs.length}
-                </td>
-            </tr>
+                </TableCell>
+            </TableRow>
         ) 
     }
     else return null
@@ -31,17 +39,19 @@ const Users = () => {
     return(
         <div>
             <h2>users</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>blogs created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {users.map(user => <UserRow user={user} />)}
-                </tbody>
-            </table>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell> Name of User </TableCell>
+                            <TableCell> # of Blogs Created </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users.map(user => <UserRow user={user} />)}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
     )
 }

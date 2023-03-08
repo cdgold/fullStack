@@ -15,8 +15,19 @@ import { setMessage } from "./reducers/notificationReducer"
 import { setErrorMessage } from "./reducers/notificationReducer"
 import {
   BrowserRouter as Router,
-  Routes, Route, Link, useMatch
+  Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
+import {   Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper, 
+  AppBar,
+  Toolbar,
+  Button,
+} from "@mui/material"
 
 const Togglable = (props) => {
   const [visible, setVisible] = useState(false)
@@ -31,11 +42,11 @@ const Togglable = (props) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button onClick={toggleVisibility} color="primary" variant="outlined">{props.buttonLabel}</Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <Button onClick={toggleVisibility} color="secondary" variant="outlined">cancel</Button>
       </div>
     </div>
   )
@@ -43,7 +54,6 @@ const Togglable = (props) => {
 
 const Home = ({blogs, createBlog}) => {
   const blogStyle = {
-    paddingTop: 10,
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
@@ -55,34 +65,55 @@ const Home = ({blogs, createBlog}) => {
     <Togglable buttonLabel="new blog">
       <BlogForm createBlog = {createBlog}/>
     </Togglable>
-    {blogs.map(blog =>
-      <Link to={`/blogs/${blog.id}`} style={blogStyle}> {blog.title} by {blog.author} </Link>
-    )}
+      <div>
+        <h2> current entries: </h2>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {blogs.map(blog =>
+                <TableRow key={blog.id}>
+                  <TableCell>
+                    <Link to={`/blogs/${blog.id}`} style={blogStyle}> {blog.title} </Link>
+                  </TableCell>
+                  <TableCell>
+                    {blog.author}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>  
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   )
 }
 
 const Header = () => {
-  const padding = {
-    paddingRight: 5
-  }
   return(
     <div>
       <Notification />
       <ErrorNotification />
-      <Link style={padding} to="/"> blogs </Link>
-      <Link style={padding} to="/users"> users </Link>
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <Button color="secondary" component={Link} to="/">
+            home
+          </Button>
+          <Button color="secondary" component={Link} to="/users">
+            users
+          </Button>                        
+        </Toolbar>
+      </AppBar>
     </div>
   )
 }
 
 const App = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [blogs, users] = useSelector(state => {
     let returnBlogs = []
     if (state.blogs !== undefined){
-      console.log("state is now: ", state)
       const arrayToSort = [...state.blogs]
       const sortedBlogs = arrayToSort.sort((a, b) => {return b.likes - a.likes})
       returnBlogs = sortedBlogs
@@ -187,6 +218,7 @@ const App = () => {
           setTimeout(() => {
             dispatch(setMessage(null))
           }, 5000) 
+          navigate("/")
           }
         )
         .catch (
@@ -198,6 +230,29 @@ const App = () => {
           }
         )
     }
+  }
+
+  const addComment = ({blog, comment}) => {
+    console.log("Received blog: ", blog)
+    console.log("Received comment: ", comment)
+    blogService.postComment({id:blog.id, comment:comment})
+      .then(result => {
+        const fixedBlog = result.data
+        const newBlogs = blogs.map(blog => {
+          if (blog.id === fixedBlog.id) {
+            return fixedBlog
+          }
+          return blog
+        })
+        console.log("New blogs is: ", newBlogs)
+        dispatch(setBlogs(newBlogs))
+      })
+      .catch(error => {
+        dispatch(setErrorMessage("Error adding comment: ", error))
+        setTimeout(() => {
+          dispatch(setErrorMessage(null))
+        }, 5000)
+      })
   }
 
   useEffect(() => {
@@ -224,58 +279,66 @@ const App = () => {
 
   if (users.user === null) {
     return (
-      <div>
-        <Notification />
-        <ErrorNotification />
+      <Container>
+        <div>
+          <Notification />
+          <ErrorNotification />
         <h2>Log in to application</h2>
         <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-            type="text"
-            value={username}
-            id="username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
+          <div>
+            username
+              <input
+              type="text"
+              value={username}
+              id="username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            password
+              <input
+              type="password"
+              value={password}
+              id="password"
+              onChange={({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <Button type="submit" id="login-button" color="primary" variant="contained">login</Button>
+        </form>
         </div>
-        <div>
-          password
-            <input
-            type="password"
-            value={password}
-            id="password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit" id="login-button">login</button>
-      </form>
-      </div>
+      </Container>
     )
   }
   return (
-    <div>
-      <Header />
-      <div>
-        <h2>blogs</h2>
-        <> {users.user.name} logged in </> <button onClick={() => logout()}>logout</button>
+    <Container>
+        <div>
+          <Header />
+          <h2>blog app </h2>
+          <div>
+            <> {users.user.name} logged in </> <Button onClick={() => logout()} color="primary">logout</Button>
+          </div>
+          <div>
+            <Routes>
+              <Route path="/users/:id" element={<User user={viewedUser} />} />
+              <Route path="/users" element={<Users />} />
+              <Route 
+                path="/" 
+                element={<Home blogs={blogs} createBlog={createBlog} />
+                }
+              />
+              <Route path="/blogs/:id" element={
+                <Blog blog={viewedBlog} 
+                user={users.user} 
+                incrementLikes={incrementLikes} 
+                deleteBlog={deleteBlog}
+                addComment={addComment}
+              />
+              } 
+              />
+            </Routes>
+          </div>
       </div>
-      <Routes>
-        <Route path="/users/:id" element={<User user={viewedUser} />} />
-        <Route path="/users" element={<Users />} />
-        <Route 
-          path="/" 
-          element={<Home blogs={blogs} user={users.user} createBlog={createBlog} incrementLikes={incrementLikes} 
-            deleteBlog={deleteBlog} />
-          }
-        />
-        <Route path="/blogs/:id" element={
-          <Blog blog={viewedBlog} 
-          user={users.user} 
-          incrementLikes={incrementLikes} 
-          deleteBlog={deleteBlog}/>} 
-        />
-      </Routes>
-  </div>
+  </Container>
   )
 }
 
